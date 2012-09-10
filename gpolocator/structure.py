@@ -230,10 +230,6 @@ class Parser(object):
         before_append = self.before_append
         after_append = self.after_append
         SKIPPED = 1
-<<<<<<< HEAD
-=======
-
->>>>>>> e2f4a8fa5d8692be184695c04d3cb87877e28ad1
         for token in self.stream:
 
             # Try and execute beford_append.
@@ -332,7 +328,3 @@ class GPOLocatorParser(Parser):
         text = re.sub(r'^\x07N\\(\d+)\\\s+', '', text)
         note = dict(offset=offset, text=text, number=number)
         return target_token, note
-<<<<<<< HEAD
-=======
-
->>>>>>> e2f4a8fa5d8692be184695c04d3cb87877e28ad1
