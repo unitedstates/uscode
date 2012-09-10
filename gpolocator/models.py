@@ -259,4 +259,3 @@ class Section(Base):
         for k in set(self.data.docs) - set(ignored):
             if isinstance(k, basestring):
                 yield k, list(_subdoc_generator(k)(self))
-
