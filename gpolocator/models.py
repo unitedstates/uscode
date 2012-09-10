@@ -30,7 +30,7 @@ def _subdoc_generator(key1, key2=('I', '21')):
 
     def func(self):
         for doc in self.data.docs.get(key1, []):
-            for line in doc.codemap[key2]:
+            for line in doc.codemap.get(key2, []):
                 yield line
     return func
 
@@ -259,3 +259,4 @@ class Section(Base):
         for k in set(self.data.docs) - set(ignored):
             if isinstance(k, basestring):
                 yield k, list(_subdoc_generator(k)(self))
+

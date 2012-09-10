@@ -1,4 +1,6 @@
 import re
+from itertools import count
+
 import logbook
 
 from .utils import CachedAttribute
@@ -74,11 +76,15 @@ class TextNode(list):
 
 class Node(list):
 
-    def __init__(self, enum, linedata, text):
+    def __init__(self, enum, linedata, text=None):
         self.enum = enum
         self.linedata = linedata
         self.footnotes = []
-        self.extend([TextNode(text)])
+        if text:
+            content = [TextNode(text)]
+        else:
+            content = []
+        self.extend(content)
         self.logger = logbook.Logger(level='DEBUG')
 
     def __repr__(self):
@@ -187,6 +193,24 @@ class Node(list):
                 if node.content is not None:
                     print ' ' * indent, node.content.encode('utf-8')
 
+    def filesystem_dump(self, where, root=True):
+        text_counter = count()
+        for node in self:
+
+            if isinstance(node, TextNode):
+
+                # Unenumerate, single child (a.k.a, top-level section text).
+                if not node.enum is None and len(node) == 1:
+                    filename = 'text' + str(next(text_counter))
+                    with open(join(where, filename), 'w') as f:
+                        text = node[0].content
+                        f.write(text)
+
+            else:
+                pass
+
+            node.filesystem_dump(where, root=False)
+
 
 class Parser(object):
 
@@ -206,7 +230,6 @@ class Parser(object):
         before_append = self.before_append
         after_append = self.after_append
         SKIPPED = 1
-
         for token in self.stream:
 
             # Try and execute beford_append.
@@ -305,4 +328,3 @@ class GPOLocatorParser(Parser):
         text = re.sub(r'^\x07N\\(\d+)\\\s+', '', text)
         note = dict(offset=offset, text=text, number=number)
         return target_token, note
-
