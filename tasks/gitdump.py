@@ -4,11 +4,11 @@ import shutil
 from os.path import join
 import subprocess
 
-import fson
-from gpolocator.parser import getlines
-from gpolocator.grouper import group
-from gpolocator.structure import GPOLocatorParser
+from uscode.parser import getlines
+from uscode.grouper import group
+from uscode.structure import GPOLocatorParser
 import utils
+import fson
 
 def run(options):
     argv = options["argv"]

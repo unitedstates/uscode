@@ -5,7 +5,7 @@ from os.path import join
 import subprocess
 
 from logbook import Logger
-from gpolocator import File
+from uscode import File
 import utils
 
 
