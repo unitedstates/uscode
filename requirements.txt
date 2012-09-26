@@ -1,1 +1,4 @@
 logbook
+pytz
+scrapelib
+ipython

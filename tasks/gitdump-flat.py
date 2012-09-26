@@ -5,15 +5,14 @@ from os.path import join
 import subprocess
 
 from logbook import Logger
-
-from gpolocator import File
-from gpolocator.utils import title_filename
+from uscode import File
+import utils
 
 
 logger = Logger('debug')
 
-
-def main(argv):
+def run(options):
+    argv = options["argv"]
 
     args = [
         ('2011', '2006 Edition and Supplement V (2011)'),
@@ -59,7 +58,7 @@ def main(argv):
 
             year, commit_msg = arg
             logger.info('Writing files for %s ...' % year)
-            filename = title_filename(title, year)
+            filename = utils.title_filename(title, year)
 
             title_path = join(path, str(title))
 

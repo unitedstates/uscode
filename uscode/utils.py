@@ -1,13 +1,4 @@
-from os.path import join, expanduser
 from operator import itemgetter
-
-from .settings import USCODE_DIR
-
-
-def title_filename(title, year=2011):
-    args = map(int, (title, year[2:]))
-    return expanduser(join(USCODE_DIR, year, 'usc%02d.%02d' % tuple(args)))
-
 
 ## {{{ http://code.activestate.com/recipes/276643/ (r1)
 class CachedAttribute(object):

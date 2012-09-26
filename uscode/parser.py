@@ -17,7 +17,7 @@ provided by the house (http://uscode.house.gov/) is that you need to be
 able to tokenize the statute text into distinct subsections/paragraphs
 before you can reassemble them into a hierarchy.
 
-Because the ASCCI and XHTML files were both formatted for printing in bound
+Because the ASCII and XHTML files were both formatted for printing in bound
 volumes, they dedent paragraphs/subsections when the level of nesting gets
 high enough to squish the text too close to the right margin of the page.
 Because the text of the US Code (and most other statutes and regs) is littered

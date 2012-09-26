@@ -4,14 +4,14 @@ import shutil
 from os.path import join
 import subprocess
 
+from uscode.parser import getlines
+from uscode.grouper import group
+from uscode.structure import GPOLocatorParser
+import utils
 import fson
-from gpolocator.parser import getlines
-from gpolocator.grouper import group
-from gpolocator.utils import title_filename
-from gpolocator.structure import GPOLocatorParser
 
-
-def main(argv):
+def run(options):
+    argv = options["argv"]
 
     args = [
         ('2011', '2006 Edition and Supplement V (2011)'),
@@ -48,7 +48,7 @@ def main(argv):
         print 'Committing', year, '...'
         title = int(argv[0])
         offset = int(argv[1])
-        filename = title_filename(title, year)
+        filename = utils.title_filename(title, year)
         fp = open(filename)
         lines = getlines(fp)
         gg = group(lines)
