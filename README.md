@@ -19,4 +19,5 @@ Run the debug script with the title as the first argument and the offset of the 
     python gpolocator-debug.py [title] [offset]
 
 So to view title 11, section 1, which is the definitions section of the bankruptcy code, run:
+
     python gpolocator-debug.py 11 3
