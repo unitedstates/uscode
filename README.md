@@ -1,7 +1,7 @@
-code
+Parsing the US Code
 ====
 
-A parser for the US Code, and USCprelim. From GPO locator codes to JSON.
+A parser for the US Code. From GPO locator codes to JSON.
 
 
 To Download the Data
@@ -20,5 +20,3 @@ Run the debug script with the title as the first argument and the offset of the 
 
 So to view title 11, section 1, which is the definitions section of the bankruptcy code, run:
     python gpolocator-debug.py 11 3
-
-
