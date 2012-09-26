@@ -14,15 +14,15 @@ scraper = scrapelib.Scraper(requests_per_minute=120, follow_robots=False, retry_
 
 # manage input and output dirs
 
-from os.path import abspath, join, dirname, expanduser
+def output_dir():
+  return "data/output"
 
-DATA_DIR = join(dirname(abspath(__file__)), '..', 'data')
-USCODE_DIR = join(DATA_DIR, 'uscode.house.gov/zip/')
+def input_dir():
+  return "data/uscode.house.gov/zip"
 
 def title_filename(title, year=2011):
   year = str(year)
-  args = map(int, (title, year[2:]))
-  return expanduser(join(USCODE_DIR, year, 'usc%02d.%02d' % tuple(args)))
+  return os.path.join(input_dir(), year, 'usc%02d.%02d' % (int(title), int(year[2:])))
 
 
 # general purpose
