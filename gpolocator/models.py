@@ -4,6 +4,7 @@ from collections import namedtuple
 
 from .utils import CachedAttribute
 from .schemes import Enum
+from .structure import GPOLocatorParser
 
 
 class DataQualityError(Exception):
@@ -58,6 +59,7 @@ class Base(object):
         abstract = True
 
     def __init__(self, data):
+        self.sub = []
         self.data = data
 
     @property
@@ -101,7 +103,6 @@ class Base(object):
 
 
 class Title(Base):
-
     applies_to = ('F', '5800')
 
     @CachedAttribute
@@ -161,6 +162,14 @@ class TitleTOC(Base):
             yield toc(chapter, name, section)
 
 
+class Subtitle(Base):
+    pass
+
+
+class Chapter(Base):
+    pass
+
+
 class ChapterHeading(Base):
     '''Heading element for a chapter.
     '''
@@ -201,6 +210,18 @@ class ChapterHeading(Base):
             yield toc(section, name)
 
 
+class Subchapter(Base):
+    pass
+
+
+class Part(Base):
+    pass
+
+
+class Subpart(Base):
+    pass
+
+
 class Section(Base):
     applies_to = ('I', '80')
 
@@ -213,6 +234,9 @@ class Section(Base):
     derivation = _subdoc_generator('Derivation')
     refs = _subdoc_generator('References In Text')
     codification = _subdoc_generator('Codification')
+
+    def __repr__(self):
+        return '<Section %s>' % self.enum()
 
     def name(self):
         name = self.data.docs[('I', '89')].first.lines.first
@@ -259,3 +283,6 @@ class Section(Base):
         for k in set(self.data.docs) - set(ignored):
             if isinstance(k, basestring):
                 yield k, list(_subdoc_generator(k)(self))
+
+    def as_tree(self):
+        return GPOLocatorParser(self.body_lines()).parse()

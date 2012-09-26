@@ -4,9 +4,9 @@ from operator import itemgetter
 from .settings import USCODE_DIR
 
 
-def title_filename(title, year_2_digits=10):
-    args = map(int, (title, year_2_digits))
-    return expanduser(join(USCODE_DIR, 'usc%02d.%02d' % tuple(args)))
+def title_filename(title, year=2011):
+    args = map(int, (title, year[2:]))
+    return expanduser(join(USCODE_DIR, year, 'usc%02d.%02d' % tuple(args)))
 
 
 ## {{{ http://code.activestate.com/recipes/276643/ (r1)
