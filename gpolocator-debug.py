@@ -1,4 +1,3 @@
-#! /home/thom/ve/2.7/bin/python
 import sys
 import pprint
 
