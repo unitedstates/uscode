@@ -2,6 +2,8 @@ from .parser import getlines
 from .grouper import group
 from .models import *
 
+def title_for(filename):
+    return File(open(filename))
 
 class File(object):
 

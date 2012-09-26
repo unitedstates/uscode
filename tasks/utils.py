@@ -20,8 +20,9 @@ DATA_DIR = join(dirname(abspath(__file__)), '..', 'data')
 USCODE_DIR = join(DATA_DIR, 'uscode.house.gov/zip/')
 
 def title_filename(title, year=2011):
-    args = map(int, (title, year[2:]))
-    return expanduser(join(USCODE_DIR, year, 'usc%02d.%02d' % tuple(args)))
+  year = str(year)
+  args = map(int, (title, year[2:]))
+  return expanduser(join(USCODE_DIR, year, 'usc%02d.%02d' % tuple(args)))
 
 
 # general purpose
