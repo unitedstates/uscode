@@ -53,9 +53,9 @@ def main(argv):
     succeeded = 0
     failed = 0
     failed_objs = []
-    for title in range(1, 51):
+    for arg in reversed(args):
 
-        for arg in reversed(args):
+        for title in range(1, 51):
 
             year, commit_msg = arg
             logger.info('Writing files for %s ...' % year)
@@ -110,12 +110,13 @@ def main(argv):
         # os.mkdir(join(path, 'title%d' % title))
         #js = qq.json()
         #fson.dump(js, join(path, 'title%d' % title))
-        cmd = 'cd %r && git add . && git commit -am"%s"' % (path, msg)
-        print 'Running', repr(cmd)
-        try:
-            out = subprocess.check_output(commit_msg, shell=True)
-        except subprocess.CalledProcessError as e:
-            print e
+            commit_msg = 'Title %d: %s' % (title, commit_msg)
+            cmd = 'cd %r && git add . && git commit -am"%s"' % (path, commit_msg)
+            logger.info('Running %r' % repr(cmd))
+            try:
+                out = subprocess.check_output(cmd, shell=True)
+            except subprocess.CalledProcessError as e:
+                print e
     # subprocess.check_call('cd /home/thom/code && octogit create '
     #                       '11USC101 "11 USC 101 in git"', shell=True)
     # subprocess.check_call('cd %s && git push origin master' % path, shell=True)
