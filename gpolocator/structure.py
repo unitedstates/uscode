@@ -1,4 +1,6 @@
+import os
 import re
+from os.path import join
 from itertools import count
 
 import logbook
@@ -64,7 +66,32 @@ class Stream(object):
         return self._stream[self.i - n]
 
 
-class TextNode(list):
+class BaseNode(list):
+
+    def filesystem_dump(self, path, root=True):
+        text_counter = count()
+        for node in self:
+
+            if isinstance(node, TextNode):
+
+                # Unenumerate, single child (a.k.a, top-level section text).
+                filename = 'text' + str(next(text_counter))
+                filename = join(path, filename)
+                logger.info('Writing text to %s' % filename)
+                with open(filename, 'w') as f:
+                    text = node.content.encode('utf-8')
+                    logger.info('..text: ' + repr(text[:70] + '...'))
+                    f.write(text)
+
+            else:
+                if node.enum:
+                    newdir = join(path, str(node.enum.text))
+                    os.mkdir(newdir)
+
+            node.filesystem_dump(path, root=False)
+
+
+class TextNode(BaseNode):
     '''A text node can (sometimes) have children.'''
 
     def __init__(self, content):
@@ -73,8 +100,13 @@ class TextNode(list):
     def __repr__(self):
         return 'TextNode(%r)' % self.content
 
+    def json(self):
+        return {'type': 'textnode',
+                'content': self.content,
+                'sub': [node.json() for node in self]}
 
-class Node(list):
+
+class Node(BaseNode):
 
     def __init__(self, enum, linedata, text=None):
         self.enum = enum
@@ -193,23 +225,22 @@ class Node(list):
                 if node.content is not None:
                     print ' ' * indent, node.content.encode('utf-8')
 
-    def filesystem_dump(self, where, root=True):
-        text_counter = count()
+    def filedump(self, fp, indent=0):
+
+        fp.write(' ' * indent)
+        if self.enum:
+            fp.write('(%s)' % self.enum.text)  # '[{0}, {1}]'.format(*self.linedata)
         for node in self:
+            if isinstance(node, Node):
+                node.filedump(fp, indent=indent + 2)
+            elif isinstance(node, TextNode):
+                if node.content is not None:
+                    fp.write(' ')
+                    fp.write(node.content.encode('utf-8'))
 
-            if isinstance(node, TextNode):
 
-                # Unenumerate, single child (a.k.a, top-level section text).
-                if not node.enum is None and len(node) == 1:
-                    filename = 'text' + str(next(text_counter))
-                    with open(join(where, filename), 'w') as f:
-                        text = node[0].content
-                        f.write(text)
-
-            else:
-                pass
-
-            node.filesystem_dump(where, root=False)
+    def json(self):
+        return dict(type='node', sub=[node.json() for node in self])
 
 
 class Parser(object):
