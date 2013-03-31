@@ -1,5 +1,6 @@
-# Download and unzip all uscode files for 2011.
-# Run it from the uscode folder.
+# Download and unzip all uscode files for a year.
+# Run it from the uscode folder. Specify a year on
+# the command line eg: download/gpolocator.sh 2011
 DIR=`pwd`"/data"
 DEST="$DIR/uscode.house.gov/zip/$1/"
 #echo $DIR

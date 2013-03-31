@@ -3,15 +3,15 @@ import sys
 
 from logbook import Logger
 
-from gpolocator import File
-from gpolocator.utils import title_filename
+from uscode import File
+from utils import title_filename
 
 
 logger = Logger('debug')
 
 
-def main():
-    filename = title_filename(int(sys.argv[1]), '2011')
+def run(options):
+    filename = title_filename(int(options["title"]), '2011')
     fp = open(filename)
 
     gpo_file = File(fp)
@@ -35,7 +35,7 @@ def main():
 
 
 
-    # ss = ff[int(sys.argv[2])].instance
+    # ss = ff[int(options["offset"])].instance
     # bb = ss.body_lines()
     # xx = GPOLocatorParser(bb)
     # qq = xx.parse()
