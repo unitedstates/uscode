@@ -2,7 +2,9 @@
 # run with: ./run xhtml_to_structure year=2011 > structure.json 
 
 import glob, re, lxml.html, json, sys
+import HTMLParser
 
+pars = HTMLParser.HTMLParser()
 section_symbol = u'\xa7'
 
 def run(options):
@@ -28,6 +30,12 @@ def run(options):
         # This is a "!@!"-separated string giving the table-of-contents
         # path to each section as we see it.
         expcite = m.group(1)
+        
+        # These comments have HTML entities. Replace them with unicode.
+        expcite = expcite.replace("&nbsp;", " ")
+        expcite = pars.unescape(expcite)
+        
+        # Parse the table of contents path.
         path = parse_expcite(expcite)
             
       elif n.tag == "h3":
@@ -58,7 +66,7 @@ def parse_expcite(expcite):
   
   # Parse each part of the path:
   for i in xrange(len(path)):
-    if re.match(r"\[.*-(REPEALED|RESERVED|OMITTED|TRANSFERRED)\](&nbsp;)?$", path[i], re.I):
+    if re.match(r"\[.*-(REPEALED|RESERVED|OMITTED|TRANSFERRED)\]\s*$", path[i], re.I):
       # This part is repealed. No need to process this path at all.
       path = None
       break
@@ -73,11 +81,14 @@ def parse_expcite(expcite):
     elif m.group(1):
       # Matches TITLE|CHAPTER...
       # Store as (TITLE|CHAPTER, NUMBER, NAME)
-      path[i] = (m.group(1).lower(), m.group(2), m.group(3))
+      # Replace en-dashes in the number with simple dashes, as we do with section numbers.
+      path[i] = (m.group(1).lower(), m.group(2).replace(u"\u2013", "-"), m.group(3))
       
       # Reformat title appendices: XXX, APPENDIX => XXXa.
-      if path[i][0] == "title" and ", APPENDIX" in path[i][1]:
+      if i == 0 and path[i][0] == "title" and ", APPENDIX" in path[i][1]:
         path[i] = (path[i][0], path[i][1].replace(", APPENDIX", "a"), path[i][2] + " (APPENDIX)")
+      elif i == 0 and path[i][0] == "title" and path[i][2] == "APPENDIX": # titles 5, 18 look like this
+        path[i] = (path[i][0], path[i][1] + "a", path[i][2])
       
     elif m.group(4) and i == len(path) - 1:
       # Matches a section number or range of sections.
@@ -97,7 +108,7 @@ def parse_h3(path, h3, TOC):
     # repealed/transferred sections.
     return
     
-  # Reformat section numbers. Replace en-dashes with simple dashes.
+  # Reformat section numbers. Replace en-dashes with simple dashes, as we do with chapter etc. numbers.
   h3 = h3.replace(u"\u2013", "-")
     
   # Parse the section number and description, and add that to the path.
