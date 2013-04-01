@@ -11,11 +11,18 @@ def run(options):
   # Output data structure.
   TOC = [ ]
   
+  year = options.get("year", "uscprelim") # default to USCprelim
+
   path = None
   
   # Loop through all titles of the code...
-  for fn in glob.glob("data/uscode.house.gov/xhtml/" + options["year"] + "/*.htm"):
-    if not re.search(options["year"] + r"usc\d+a?\.htm$", fn): continue # is it a title file?
+  for fn in glob.glob("data/uscode.house.gov/xhtml/" + year + "/*.htm"):
+    if year == "uscprelim":
+      match = "PRELIM"
+    else:
+      match = year
+
+    if not re.search(match + r"usc\d+a?\.htm$", fn, re.I): continue # is it a title file?
     
     # Parse the XHTML file...
     dom = lxml.html.parse(fn)
