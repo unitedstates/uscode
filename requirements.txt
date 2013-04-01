@@ -2,3 +2,4 @@ logbook
 pytz
 scrapelib
 ipython
+lxml
