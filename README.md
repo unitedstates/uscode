@@ -2,6 +2,7 @@
 
 A parser for the US Code's structure, and a work-in-progress parser for the US Code's full content.
 
+
 ### Setup
 
 Create a virtual environment:
@@ -9,6 +10,7 @@ Create a virtual environment:
     virtualenv virt
     source virt/bin/activate
     pip install -r requirements.txt
+
 
 ### Getting the structure of the Code
 
@@ -67,7 +69,7 @@ Example:
 ]
 ```
 
-### Getting the content of the Code (alpha)
+### Getting the content of the Code (work-in-progress)
 
 To get at the content of the Code:
 
