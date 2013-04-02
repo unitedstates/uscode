@@ -10,12 +10,7 @@ section_symbol = u'\xa7'
 def run(options):
   year = options.get("year", "uscprelim") # default to USCprelim
 
-
-  # Output data structure.
-  TOC = [ ]
-  path = None
   
-
   # optional: don't print json out, just --debug information
   debug = options.get('debug', False)
 
@@ -33,6 +28,13 @@ def run(options):
   limit = options.get("limit", None)
   if limit:
     filenames = filenames[0:int(limit)]
+
+
+  # Output and intermediary data structures.
+
+  TOC = [ ]
+  path = None
+
 
   # Loop through all titles of the code...
   for fn in filenames:
