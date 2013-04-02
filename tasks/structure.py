@@ -1,11 +1,22 @@
 # Uses the XHTML files to extract a table of contents for the US Code.
-# run with: ./run xhtml_to_structure year=2011 > structure.json 
+# Defaults to USCprelim.
+# 
+# run with: 
+#  ./run structure > structure.json 
+#
+# options:
+#   year: "uscprelim" (the default), or a specific year version of the Code (e.g. "2011")
+#   title: Do only a specific title (e.g. "5", "5a", "25")
+#   sections: Return a flat hierarchy of only titles and sections (no intervening layers)
+#   debug: Output debug messages only, and no JSON output (dry run)
 
 import glob, re, lxml.html, json, sys
-import HTMLParser
 
+import HTMLParser
 pars = HTMLParser.HTMLParser()
+
 section_symbol = u'\xa7'
+
 
 def run(options):
   year = options.get("year", "uscprelim") # default to USCprelim
