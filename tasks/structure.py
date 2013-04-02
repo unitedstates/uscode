@@ -17,7 +17,11 @@ def run(options):
   # optional: limit to a specific --title
   title = options.get("title", None)
   if title:
-    title = "*usc%02d" % int(title) # doesn't handle appendix titles e.g. 5a :/
+    # appendix cites may look like "5a" but we need "05a" to match the file
+    if title.endswith("a"):
+      title = "*usc%02da" % int(title[0:-1])
+    else:
+      title = "*usc%02d" % int(title)
   else:
     title = "*usc*"
 
@@ -43,7 +47,8 @@ def run(options):
   for fn in filenames:
     match = re.search(r"usc(\d+a?)\.htm$", fn, re.I)
     if not match: continue
-    
+
+    # extract title, to have on hand when parsing sections, and debug output
     title = match.groups(1)[0]
     if debug:
       print "[%s] Processing title..." % title
@@ -78,7 +83,7 @@ def run(options):
         if not path: raise Exception("h3 without path")
         
         # Insert the section into our TOC structure.
-        parse_h3(path, h3, TOC, sections_only)
+        parse_h3(path, h3, TOC, title, sections_only)
         
         # Clear so we don't reuse the path on the next h3.
         path = None
@@ -136,7 +141,7 @@ def parse_expcite(expcite):
       
   return path
   
-def parse_h3(path, h3, TOC, sections_only = False):
+def parse_h3(path, h3, TOC, title, sections_only = False):
   # Skip sections that are just placeholders.
   if re.match(section_symbol + section_symbol + r"?(.*?)\. (Repealed.*|Transferred|Omitted)(\.|$)", h3):
     # This is for multiple sections, which are always repealed, or
@@ -149,7 +154,11 @@ def parse_h3(path, h3, TOC, sections_only = False):
   # Parse the section number and description, and add that to the path.
   m = re.match(section_symbol + r"(.*?)\.? (.*)", h3)
   if not m: raise Exception("Could not parse: " + h3)
-  path.append( ("section", m.group(1), m.group(2)) )
+
+  number = m.group(1)
+  name = m.group(2)
+  citation = citation_for(title, number)
+  path.append( ("section", number, name, citation))
   
 
   # Add the new path into the TOC, making a structure like:
@@ -168,13 +177,26 @@ def parse_h3(path, h3, TOC, sections_only = False):
       _toc.append( (p, []) )
     _toc = _toc[-1][1] # move in  
 
+
 def reformat_structure(entry):
   ret = {
     "level": entry[0][0],
     "number": entry[0][1],
     "name": entry[0][2],
   }
+
+  # sections have an additional citation field
+  if entry[0][0] == "section":
+    ret["citation"] = entry[0][3]
+
   if len(entry[1]):
     ret["subparts"] = [reformat_structure(e) for e in entry[1]]
   return ret
   
+def citation_for(title, number):
+  # title may be 0-prefixed, ditch for purposes of citation
+  if title.startswith("0"):
+    t = title[1:]
+  else:
+    t = title
+  return "usc/%s/%s" % (t, number)
