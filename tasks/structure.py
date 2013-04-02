@@ -15,8 +15,16 @@ def run(options):
 
   path = None
   
+  filenames = glob.glob("data/uscode.house.gov/xhtml/" + year + "/*.htm")
+
+  limit = options.get("limit", None)
+  if limit:
+    filenames = filenames[0:int(limit)]
+
   # Loop through all titles of the code...
-  for fn in glob.glob("data/uscode.house.gov/xhtml/" + year + "/*.htm"):
+  for fn in filenames:
+
+    # filename match pattern
     if year == "uscprelim":
       match = "PRELIM"
     else:
