@@ -12,7 +12,7 @@ Create a virtual environment:
 
 ### Getting the structure of the Code
 
-To get a `structure.json` file of the Code - its hierarchy but not its content - you can parse the most recent XHTML version of the Code (USCprelim)
+Get the hierarchy of the US Code (not its content), in JSON.
 
 First, download the XHTML to disk:
 
@@ -20,12 +20,52 @@ First, download the XHTML to disk:
 ./download/xhtml.sh uscprelim
 ```
 
-Then, run the script, which defaults to USCprelim:
+Then, run the script to output a JSON version of the US Code's structure to STDOUT:
 
 ```bash
-./run xhtml_to_structure
+./run structure
 ```
 
+Options:
+
+* `--year`: "uscprelim" (the default), or a specific year version of the Code (e.g. "2011")
+* `--title`: Do only a specific title (e.g. "5", "5a", "25")
+* `--sections`: Return a flat hierarchy of only titles and sections (no intervening layers)
+* `--debug`: Output debug messages only, and no JSON output (dry run)
+
+Example:
+
+```json
+[
+  {
+    "level": "title", 
+    "name": "GENERAL PROVISIONS", 
+    "number": "1", 
+    "subparts": [
+      {
+        "level": "chapter", 
+        "name": "RULES OF CONSTRUCTION", 
+        "number": "1", 
+        "subparts": [
+          {
+            "citation": "usc/1/1", 
+            "level": "section", 
+            "name": "Words denoting number, gender, and so forth", 
+            "number": "1"
+          }, 
+          {
+            "citation": "usc/1/2", 
+            "level": "section", 
+            "name": "\u201cCounty\u201d as including \u201cparish\u201d, and so forth", 
+            "number": "2"
+          },
+          ...
+        ]
+      }
+    ]
+  }
+]
+```
 
 ### Getting the content of the Code (alpha)
 
