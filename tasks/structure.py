@@ -8,30 +8,41 @@ pars = HTMLParser.HTMLParser()
 section_symbol = u'\xa7'
 
 def run(options):
-  # Output data structure.
-  TOC = [ ]
-  
   year = options.get("year", "uscprelim") # default to USCprelim
 
+
+  # Output data structure.
+  TOC = [ ]
   path = None
   
-  filenames = glob.glob("data/uscode.house.gov/xhtml/" + year + "/*.htm")
 
+  # optional: don't print json out, just --debug information
+  debug = options.get('debug', False)
+
+  # optional: limit to a specific --title
+  title = options.get("title", None)
+  if title:
+    title = "*usc%02d" % int(title) # doesn't handle appendix titles e.g. 5a :/
+  else:
+    title = "*usc*"
+
+  filenames = glob.glob("data/uscode.house.gov/xhtml/" + year + "/%s.htm" % title)
+  filenames.sort()
+
+  # optional: --limit to a number of titles
   limit = options.get("limit", None)
   if limit:
     filenames = filenames[0:int(limit)]
 
   # Loop through all titles of the code...
   for fn in filenames:
-
-    # filename match pattern
-    if year == "uscprelim":
-      match = "PRELIM"
-    else:
-      match = year
-
-    if not re.search(match + r"usc\d+a?\.htm$", fn, re.I): continue # is it a title file?
+    match = re.search(r"usc(\d+a?)\.htm$", fn, re.I)
+    if not match: continue
     
+    title = match.groups(1)[0]
+    if debug:
+      print "[%s] Processing title..." % title
+
     # Parse the XHTML file...
     dom = lxml.html.parse(fn)
     
@@ -74,7 +85,10 @@ def run(options):
   TOC = [reformat_structure(title) for title in TOC]
 
   # Write output in JSON to stdout.
-  json.dump(TOC, sys.stdout, indent=True, sort_keys=True, check_circular=False)
+  if debug:
+    print "\n(dry run only, not outputting)"
+  else:
+    json.dump(TOC, sys.stdout, indent=True, sort_keys=True, check_circular=False)
   
 def parse_expcite(expcite):
   path = expcite.split("!@!")
