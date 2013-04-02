@@ -12,12 +12,17 @@ task_name = sys.argv[1]
 options = {}
 args = sys.argv[2:]
 for arg in args:
-  if "=" in arg:
-    key, value = arg.split('=')
-    if key and value:
-      if value == 'True': value = True
-      elif value == 'False': value = False
-      options[key.lower()] = value
+  if arg.startswith("--"):
+
+    if "=" in arg:
+      key, value = arg.split('=')
+    else:
+      key, value = arg, True
+    
+    key = key.split("--")[1]
+    if value == 'True': value = True
+    elif value == 'False': value = False
+    options[key.lower()] = value
 
 # store original raw args array after task name
 options['argv'] = args
