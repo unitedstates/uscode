@@ -29,6 +29,9 @@ def run(options):
   if limit:
     filenames = filenames[0:int(limit)]
 
+  # optional: only retrieve titles and --sections, nothing in between
+  sections_only = options.get("sections", False)
+
 
   # Output and intermediary data structures.
 
@@ -75,7 +78,7 @@ def run(options):
         if not path: raise Exception("h3 without path")
         
         # Insert the section into our TOC structure.
-        parse_h3(path, h3, TOC)
+        parse_h3(path, h3, TOC, sections_only)
         
         # Clear so we don't reuse the path on the next h3.
         path = None
@@ -113,6 +116,7 @@ def parse_expcite(expcite):
       # Matches TITLE|CHAPTER...
       # Store as (TITLE|CHAPTER, NUMBER, NAME)
       # Replace en-dashes in the number with simple dashes, as we do with section numbers.
+      
       path[i] = (m.group(1).lower(), m.group(2).replace(u"\u2013", "-"), m.group(3))
       
       # Reformat title appendices: XXX, APPENDIX => XXXa.
@@ -132,7 +136,7 @@ def parse_expcite(expcite):
       
   return path
   
-def parse_h3(path, h3, TOC):
+def parse_h3(path, h3, TOC, sections_only = False):
   # Skip sections that are just placeholders.
   if re.match(section_symbol + section_symbol + r"?(.*?)\. (Repealed.*|Transferred|Omitted)(\.|$)", h3):
     # This is for multiple sections, which are always repealed, or
@@ -147,6 +151,7 @@ def parse_h3(path, h3, TOC):
   if not m: raise Exception("Could not parse: " + h3)
   path.append( ("section", m.group(1), m.group(2)) )
   
+
   # Add the new path into the TOC, making a structure like:
   #  [ ( (title, 17, Copyright), [
   #       ... sub parts ..
@@ -154,6 +159,11 @@ def parse_h3(path, h3, TOC):
   #  ]
   _toc = TOC
   for p in path:
+
+    # allow the caller to discard levels that are not normally cited
+    if sections_only and (p[0] not in ['title', 'section']):
+      continue
+
     if len(_toc) == 0 or _toc[-1][0] != p:
       _toc.append( (p, []) )
     _toc = _toc[-1][1] # move in  
