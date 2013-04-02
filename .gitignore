@@ -1,4 +1,6 @@
 /virt
 /data
+
 *.pyc
 *.json
+/todo*
