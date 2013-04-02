@@ -1,7 +1,7 @@
 # Uses the XHTML files to extract a table of contents for the US Code.
 # Defaults to USCprelim.
 # 
-# run with: 
+# Outputs JSON to STDOUT. Run and save with:
 #  ./run structure > structure.json 
 #
 # options:
