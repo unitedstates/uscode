@@ -98,7 +98,7 @@ def run(options):
   if debug:
     print "\n(dry run only, not outputting)"
   else:
-    json.dump(TOC, sys.stdout, indent=True, sort_keys=True, check_circular=False)
+    json.dump(TOC, sys.stdout, indent=2, sort_keys=True, check_circular=False)
   
 def parse_expcite(expcite):
   path = expcite.split("!@!")
