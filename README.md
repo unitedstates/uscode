@@ -14,19 +14,13 @@ Create a virtual environment:
 
 ### Getting the structure of the Code
 
-Get the hierarchy of the US Code (not its content), in JSON.
-
-First, download the XHTML to disk:
-
-```bash
-./download/xhtml.sh uscprelim
-```
-
-Then, run the script to output a JSON version of the US Code's structure to STDOUT:
+To output the hierarchy of the US Code to STDOUT, in JSON:
 
 ```bash
 ./run structure
 ```
+
+The script will first download the 
 
 Options:
 
@@ -34,6 +28,7 @@ Options:
 * `--title`: Do only a specific title (e.g. "5", "5a", "25")
 * `--sections`: Return a flat hierarchy of only titles and sections (no intervening layers)
 * `--debug`: Output debug messages only, and no JSON output (dry run)
+* `--force`: Force a re-download of the US Code. Use this flag if you're automatically running the script at an interval.
 
 Example:
 

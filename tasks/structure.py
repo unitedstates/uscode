@@ -1,4 +1,4 @@
-# Uses the XHTML files to extract a table of contents for the US Code.
+# Downloads and uses the XHTML version of the US Code to extract a table of contents.
 # Defaults to USCprelim.
 # 
 # Outputs JSON to STDOUT. Run and save with:
@@ -9,8 +9,11 @@
 #   title: Do only a specific title (e.g. "5", "5a", "25")
 #   sections: Return a flat hierarchy of only titles and sections (no intervening layers)
 #   debug: Output debug messages only, and no JSON output (dry run)
+#   force: Force a re-download of the US Code for the given year (script defaults to caching if the directory for a year is present)
 
-import glob, re, lxml.html, json, sys
+import glob, re, lxml.html, json, sys, os
+
+import utils
 
 import HTMLParser
 pars = HTMLParser.HTMLParser()
@@ -35,6 +38,10 @@ def run(options):
       title = "*usc%02d" % int(title)
   else:
     title = "*usc*"
+
+  # sync XHTML to disk as needed (cache by default)
+  download_usc(year, options)
+
 
   filenames = glob.glob("data/uscode.house.gov/xhtml/" + year + "/%s.htm" % title)
   filenames.sort()
@@ -211,3 +218,19 @@ def citation_for(title, number):
   else:
     t = title
   return "usc/%s/%s" % (t, number)
+
+
+
+def download_usc(year, options):
+  debug = options.get("debug", False)
+
+  dest_dir = "data/uscode.house.gov/xhtml/%s" % year
+
+  if os.path.isdir(dest_dir) and not options.get("force", False):
+    if debug: print "Cached, not downloading again"
+    return # assume it's downloaded
+
+  if debug: print "Downloading US Code XHTML for %s" % year
+  utils.mkdir_p(dest_dir)
+  os.system("rm %s/*" % dest_dir)
+  os.system("wget -q -m -l1 -P %s http://uscode.house.gov/xhtml/%s" % ("data", year))
