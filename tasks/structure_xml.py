@@ -83,6 +83,10 @@ def proc_node(node, parent, path, sections_only):
   entry["name"] = entry["name"].replace(u"\u2019", "'") # curly right apostrophe => straight apostrophe (it's inconsistent, so for diffs: sed -i "s/\\\\u2019/'/g" structure_html.json)
   entry["name"] = entry["name"].replace(u"\u202f", u"\u00a0") # narrow no-break space => no-break space (probably convert this to a space later on)
   entry["name"] = entry["name"].replace(u"\u2013", "-") # replace en-dashes with simple hyphens
+  if u"\u00a7\u202f" in entry["number"]: return # the HTML converter misses these
+  
+  # Misformatting
+  entry["number"] = entry["number"].replace(u"\u00a7\u202f", "") # section symbol plus narrow no-break space
 
   # Text reformatting.
   entry["name"] = entry["name"].strip() # TODO: Flag upstream, remove this line when fixed.
@@ -92,12 +96,13 @@ def proc_node(node, parent, path, sections_only):
   if entry["number"] == "": entry["number"] = None
   
   # Don't record structure of phantom parts.
-  if entry["name"] in ("Repealed", "Reserved", "Omitted", "Omitted]", "Transferred", "Transferred]", "Omitted or Transferred", "Vacant]"):
+  if entry["name"] in ("]", "Repealed", "Reserved", "Reserved]", "Omitted", "Omitted]", "Transferred", "Transferred]", "Omitted or Transferred", "Vacant]"):
     return
   if re.match(r"(Repealed.*|Transferred|Omitted|Renumbered .*\])(\.|$)", entry["name"]):
     return
 
   # Make a path array of level numbering in the path to this section.
+  # (To compare with the old HTML output, disable everything but section-level citations.)
   path = path + [entry["number"]]
   if len(path) == 1: # titles
     entry["citation"] = "usc/title/%s" % entry["number"]
@@ -115,8 +120,10 @@ def proc_node(node, parent, path, sections_only):
   
   children = []
   
-  for child in node.xpath("uslm:title|uslm:subtitle|uslm:chapter|uslm:subchapter|uslm:part|uslm:subpart|uslm:division|uslm:level|uslm:section", namespaces=ns):
-    proc_node(child, children, path, sections_only)
+  if entry["level"] != "section":
+  	  # 25 USC 450l has a section within a section, so skip this processing because we never want bottom-half levels of structure
+	  for child in node.xpath("uslm:title|uslm:subtitle|uslm:chapter|uslm:subchapter|uslm:part|uslm:subpart|uslm:division|uslm:level|uslm:section", namespaces=ns):
+		proc_node(child, children, path, sections_only)
 
   if len(children):
     entry["subparts"] = children
