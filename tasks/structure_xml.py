@@ -57,7 +57,7 @@ def run(options):
     #print xmlbody
     dom = lxml.etree.fromstring(xmlbody)
     titlenode = dom.xpath("uslm:main/uslm:title", namespaces=ns)[0]
-    proc_node(titlenode, TOC, None, sections_only)
+    proc_node(titlenode, TOC, [], sections_only)
 
   # Sort the titles (take into account appendix notation).
   TOC.sort(key = lambda title : (int(title["number"].replace("a", "")), title["number"]))
@@ -68,7 +68,7 @@ def run(options):
   else:
     json.dump(TOC, sys.stdout, indent=2, sort_keys=True, check_circular=False)
   
-def proc_node(node, parent, title, sections_only):
+def proc_node(node, parent, path, sections_only):
   # Form the node for this title/chapter/.../section.
   
   remove_footnotes(node.xpath("uslm:heading", namespaces=ns)[0])
@@ -97,11 +97,14 @@ def proc_node(node, parent, title, sections_only):
   if re.match(r"(Repealed.*|Transferred|Omitted|Renumbered .*\])(\.|$)", entry["name"]):
     return
 
-  if entry["level"] == "title":
-    # for passing into children
-    title = entry["number"]
+  # Make a path array of level numbering in the path to this section.
+  path = path + [entry["number"]]
+  if len(path) == 1: # titles
+    entry["citation"] = "usc/title/%s" % entry["number"]
   elif entry["level"] == "section":
-    entry["citation"] = "usc/%s/%s" % (title, entry["number"])
+    entry["citation"] = "usc/%s/%s" % (path[0], entry["number"])
+  elif None not in path: # can't create a citation if there is an unnumbered level on the path
+    entry["citation"] = "usc/title/%s" % "/".join(path)
     
   # Debugging helper.
   #if entry.get("citation") == "usc/4/107":
@@ -113,7 +116,7 @@ def proc_node(node, parent, title, sections_only):
   children = []
   
   for child in node.xpath("uslm:title|uslm:subtitle|uslm:chapter|uslm:subchapter|uslm:part|uslm:subpart|uslm:division|uslm:level|uslm:section", namespaces=ns):
-    proc_node(child, children, title, sections_only)
+    proc_node(child, children, path, sections_only)
 
   if len(children):
     entry["subparts"] = children
