@@ -79,19 +79,19 @@ def proc_node(node, parent, path, sections_only):
   }
   if entry["level"] == "level": entry["level"] = "heading"
   
-  # TODO: For comparison to HTML version only. Remove me.
-  entry["name"] = entry["name"].replace(u"\u2019", "'") # curly right apostrophe => straight apostrophe (it's inconsistent, so for diffs: sed -i "s/\\\\u2019/'/g" structure_html.json)
-  entry["name"] = entry["name"].replace(u"\u202f", u"\u00a0") # narrow no-break space => no-break space (probably convert this to a space later on)
-  entry["name"] = entry["name"].replace(u"\u2013", "-") # replace en-dashes with simple hyphens
-  if u"\u00a7\u202f" in entry["number"]: return # the HTML converter misses these
+  # To compare with our older HTML scraper, put these lines back in to normalize the content a bit.
+  #entry["name"] = entry["name"].replace(u"\u2019", "'") # curly right apostrophe => straight apostrophe (it's inconsistent, so for diffs: sed -i "s/\\\\u2019/'/g" structure_html.json)
+  #entry["name"] = entry["name"].replace(u"\u202f", u"\u00a0") # narrow no-break space => no-break space (probably convert this to a space later on)
+  #entry["name"] = entry["name"].replace(u"\u2013", "-") # replace en-dashes with simple hyphens
+  #if u"\u00a7\u202f" in entry["number"]: return # the HTML converter misses these
   
   # Misformatting
   entry["number"] = entry["number"].replace(u"\u00a7\u202f", "") # section symbol plus narrow no-break space
 
   # Text reformatting.
   entry["name"] = entry["name"].strip() # TODO: Flag upstream, remove this line when fixed.
-  entry["name"] = entry["name"].replace(u"\u00ad", "") # remove soft hyphens
   entry["number"] = entry["number"].strip() # TODO: Flag upstream, remove this line when fixed.
+  entry["name"] = entry["name"].replace(u"\u00ad", "") # remove soft hyphens
   entry["number"] = entry["number"].replace(u"\u2013", "-") # replace en-dashes with simple hyphens
   if entry["number"] == "": entry["number"] = None
   
@@ -128,10 +128,8 @@ def proc_node(node, parent, path, sections_only):
   if len(children):
     entry["subparts"] = children
 
-  # TODO: For comparison to HTML version only. Remove me.
-  if not len(children) and entry["level"] != "section":
-    # don't include parts with no sections
-    return
+  # Our older HTML scraper didn't include levels without subparts, except sections. 
+  #if not len(children) and entry["level"] != "section": return
 
   # Pop back up.
 
