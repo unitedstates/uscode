@@ -108,7 +108,13 @@ def proc_node(node, parent, path, sections_only):
     entry["citation"] = "usc/title/%s" % entry["number"]
   elif entry["level"] == "section":
     entry["citation"] = "usc/%s/%s" % (path[0], entry["number"])
+  elif entry["level"] == "chapter":
+    # chapter numbering is unique within a title, like sections, but may be split across
+    # divisions and other levels beneath the title level. since finding chapter citations
+    # is important, encode them specifically.
+    entry["citation"] = "usc/chapter/%s/%s" % (path[0], entry["number"])
   elif None not in path: # can't create a citation if there is an unnumbered level on the path
+    # for other levels, encode them beneath the title as a path through the numbers
     entry["citation"] = "usc/title/%s" % "/".join(path)
     
   # Debugging helper.
