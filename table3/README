@@ -1,0 +1,26 @@
+This subdirectory contains the tools for extracting information from "Table III". As noted on http://uscode.house.gov/table3/table3explanation.htm, Table III contains information about the classification of public laws to the United States Code. This information is also available in PDF form on the U.S. Code website, but the HTML pages seemed easier to parse.
+
+The key files are:
+
+* table3_scraper.py 
+* ParseTable.py
+
+table3_scraper.py does the following:
+
+1. Parse http://uscode.house.gov/table3/table3years.htm to extract links to year-specific pages with laws, e.g. http://uscode.house.gov/table3/year1950.htm  
+2. Parse each of the year-specific pages for extract links to a page for each law, e.g. http://uscode.house.gov/table3/1950_654.htm
+3. Download the full HTML of the year-specific page.
+
+The years downloaded are specified in a set called `years` in the script. To limit the number of files downloaded, you can set the `LIMIT_SUBSUBRELEASES` to `True` and `LIMIT` to the desired total number of files.
+
+---
+
+ParseTable.py does the following:
+
+1. Take, as input, a downloaded law-specific HTML file from the final step of table3_scraper. The command is `python ParseTable.py [inputHTMLfile]
+2. Extract the mapping of public law sections to U.S. Code sections.
+
+
+
+
+
