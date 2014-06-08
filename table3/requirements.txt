@@ -1,0 +1,5 @@
+simplejson
+lxml
+httplib2
+simplejson
+bs4
